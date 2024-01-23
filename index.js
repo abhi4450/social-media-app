@@ -10,6 +10,7 @@ const adminRoutes = require("./routes/admin");
 const sequelize = require("./util/database");
 const User = require("./models/User");
 const Post = require("./models/Post");
+const Comment = require("./models/Comment");
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -30,6 +31,19 @@ app.use((req, res, next) => {
 
 User.hasMany(Post);
 Post.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
+User.hasMany(Comment);
+Comment.belongsTo(User, { constraints: true });
+Post.hasMany(Comment, {
+  foreignKey: {
+    allowNull: false,
+  },
+});
+Comment.belongsTo(Post, {
+  constraints: true,
+  foreignKey: {
+    allowNull: false,
+  },
+});
 
 app.use(adminRoutes);
 app.use(userRoutes);
@@ -41,4 +55,5 @@ sequelize
       console.log("server listening on PORT=3000");
     });
   })
+
   .catch((err) => console.log("Server is not listening...", err));
